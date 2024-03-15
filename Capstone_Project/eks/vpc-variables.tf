@@ -24,6 +24,12 @@ variable "custom_vpc_public_subnets" {
   type        = list(string)
 }
 
+# Custom VPC Private Subnets
+variable "custom_vpc_private_subnets" {
+  description = "Specify the private subnets within the VPC"
+  type        = list(string)
+}
+
 # Custom VPC Database Subnets
 variable "custom_vpc_database_subnets" {
   description = "Specify the database subnets within the VPC"
@@ -42,12 +48,11 @@ variable "custom_vpc_create_database_subnet_route_table" {
   type        = bool
 }
 
-# Custom VPC Enable NAT Gateway (True or False) 
+# Custom VPC Enable NAT Gateway (True or False)
 variable "custom_vpc_enable_nat_gateway" {
-  description = "Enable or disable NAT Gateways for outbound communication in custom private subnets"
+  description = "Choose whether to enable NAT Gateway in the VPC"
   type        = bool
 }
-
 # Custom VPC Single NAT Gateway (True or False)
 variable "custom_vpc_single_nat_gateway" {
   description = "Choose whether to enable only a single NAT Gateway in one Availability Zone to save costs during demos"

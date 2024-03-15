@@ -12,6 +12,13 @@ output "vpc_cidr_block" {
   value       = module.vpc.vpc_cidr_block
 }
 
+# Private Subnet Identifiers within the VPC
+output "private_subnets" {
+  description = "This output provides the list of private subnet identifiers within the VPC"
+  value       = module.vpc.private_subnets
+}
+
+
 # Public Subnet Identifiers within the VPC
 output "public_subnets" {
   description = "This output provides the list of public subnet identifiers within the VPC"

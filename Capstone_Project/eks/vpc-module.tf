@@ -41,9 +41,17 @@ module "vpc" {
     "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"
   }
 
+ # Adding private subnet tags.
+ private_subnet_tags ={
+   Type ="Private Subnets"
+   "kubernetes.io/role/internal-elb" = 1 
+   "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"
+}
 
   # Configuring additional tags for database subnets.
-  database_subnet_tags = {
-    Type = "Database Subnets"
+ database_subnet_tags ={
+   Type = "Database Subnets"
   }
 }
+
+
