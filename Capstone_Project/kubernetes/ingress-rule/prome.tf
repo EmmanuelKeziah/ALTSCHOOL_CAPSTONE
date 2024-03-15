@@ -22,3 +22,10 @@ resource "kubernetes_ingress_v1" "prome-ingress" {
                number = 80
                }
           }
+        }
+      }
+    }
+  }
+}
+}
+

@@ -1,48 +1,40 @@
-# Resource for waiting for Kubernetes cluster to be ready
-resource "time_sleep" "wait_for_kubernetes" {
-  depends_on      = [data.aws_eks_cluster.hr-development-eks-demo]
-  create_duration = "20s"
+data "aws_eks_node_group" "eks-node-group" {
+  cluster_name = "hr-development-eks-sock-project"
+  node_group_name = "hr-development-eks-public-ng"
 }
 
-# Resource for creating a Kubernetes namespace for nginx-ingress
-resource "kubernetes_namespace" "nginx-namespace" {
-  depends_on = [time_sleep.wait_for_kubernetes]
+resource "time_sleep" "wait_for_kubernetes" {
+
+    depends_on = [
+        data.aws_eks_cluster.hr-development-eks-sock-project
+    ]
+
+    create_duration = "20s"
+}
+
+resource "kubernetes_namespace" "kube-namespace" {
+  depends_on = [data.aws_eks_node_group.eks-node-group, time_sleep.wait_for_kubernetes]
   metadata {
-    name = "nginx-ingress"
+    
+    name = "prometheus"
   }
 }
 
-# Resource for deploying nginx-ingress using Helm
-resource "helm_release" "ingress_nginx" {
-  depends_on = [kubernetes_namespace.nginx-namespace, time_sleep.wait_for_kubernetes]
-  name       = "ingress-nginx"
-  repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  version    = "4.5.2"
-
-  namespace        = kubernetes_namespace.nginx-namespace.id
+resource "helm_release" "prometheus" {
+  depends_on = [kubernetes_namespace.kube-namespace, time_sleep.wait_for_kubernetes]
+  name       = "prometheus"
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "kube-prometheus-stack"
+  namespace  = kubernetes_namespace.kube-namespace.id
   create_namespace = true
-
+  version    = "45.7.1"
   values = [
     file("values.yaml")
   ]
+  timeout = 2000
+  
 
-  set {
-    name  = "fullnameOverride"
-    value = "load"
-  }
-
-  set {
-    name  = "controller.name"
-    value = "nginx"
-  }
-
-  set {
-    name  = "service.type"
-    value = "LoadBalancer"
-  }
-
-  set {
+set {
     name  = "podSecurityPolicy.enabled"
     value = true
   }
@@ -54,7 +46,7 @@ resource "helm_release" "ingress_nginx" {
 
   # You can provide a map of value using yamlencode. Don't forget to escape the last element after point in the name
   set {
-    name  = "server\\.resources"
+    name = "server\\.resources"
     value = yamlencode({
       limits = {
         cpu    = "200m"
@@ -65,14 +57,7 @@ resource "helm_release" "ingress_nginx" {
         memory = "30Mi"
       }
     })
-  } 
+  }
 }
-
-/* output "l" {
   
-} */
 
-# Display load balancer hostname (typically present in AWS)
-/* output "load_balancer_hostname" {
-  value = kubernetes_ingress.sock-shop.status.0.load_balancer.0.ingress.0.hostname
-} */
