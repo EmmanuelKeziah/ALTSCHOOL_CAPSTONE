@@ -70,7 +70,7 @@ pipeline {
 
        
 
-         stage("destroy prometheus") {
+         stage("Destroy prometheus") {
              when {
                 expression { params.ENVIRONMENT == 'destroy' }
             }
@@ -110,7 +110,7 @@ pipeline {
             }
         }
         
-         stage("destroy nginx-conroller") {
+         stage("Destroy nginx-conroller") {
              when {
                 expression { params.ENVIRONMENT == 'destroy' }
             }
@@ -125,3 +125,4 @@ pipeline {
 
     }
 }
+
